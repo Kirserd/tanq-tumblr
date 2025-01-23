@@ -3,88 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotating Hexagon with Three.js</title>
+    <title>Rotating Icosphere with Lighting & Fog</title>
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
-<script>
-    // Initialize the scene, camera, and renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    <script>
+        // Create scene
+        const scene = new THREE.Scene();
+        
+        // Add fog to the scene (color, near, far)
+        scene.fog = new THREE.Fog(0x111111, 5, 50);  // Dark fog with distance effect
 
-    // Create a hexagonal prism geometry
-    const hexagonShape = new THREE.Shape();
-    for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2;
-        hexagonShape.lineTo(Math.cos(angle), Math.sin(angle));
-    }
-    hexagonShape.closePath();
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 3, 8);
+        camera.lookAt(0, 0, 0);
 
-    const extrudeSettings = {
-        steps: 2,
-        depth: 1,
-        bevelEnabled: true,
-        bevelThickness: 0.2,
-        bevelSize: 0.2,
-        bevelSegments: 4
-    };
-    const geometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings);
-    
-    // Apply a standard material
-    const material = new THREE.MeshStandardMaterial({ color: 0x00ffcc, metalness: 0.5, roughness: 0.4 });
-    const hexagonMesh = new THREE.Mesh(geometry, material);
-    scene.add(hexagonMesh);
-
-    // Position the hexagon
-    hexagonMesh.position.set(0, 1, 0);
-    hexagonMesh.rotation.x = Math.PI / 6;
-
-    // Add a ground plane
-    const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
-    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-    planeMesh.rotation.x = -Math.PI / 2;
-    planeMesh.position.y = 0;
-    scene.add(planeMesh);
-
-    // Add lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft ambient light
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(3, 5, 3);
-    scene.add(pointLight);
-
-    // Position the camera
-    camera.position.set(3, 2, 5);
-    camera.lookAt(0, 1, 0);
-
-    // Animation loop
-    function animate() {
-        requestAnimationFrame(animate);
-
-        // Rotate the hexagon
-        hexagonMesh.rotation.y += 0.01;
-        hexagonMesh.rotation.x += 0.005;
-
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Handle window resizing
-    window.addEventListener('resize', () => {
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-    });
-</script>
+        renderer.setClearColor(0x111111); // Set background color
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;  // Smooth motion
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = true;     // Allow zooming
+        controls.autoRotate = false;    // Optional: Auto-rotation
+        controls.target.set(0, 0, 0);   // Point of interest
+
+        // Add rotating icosphere geometry
+        const icosphereGeometry = new THREE.IcosahedronGeometry(2, 0);
+        const icosphereMaterial = new THREE.MeshStandardMaterial({
+            color: 0xff8c00,
+            metalness: 0.8,
+            roughness: 0.4,
+            emissive: 0x330011,
+            emissiveIntensity: 0.2
+        });
+        const icosphere = new THREE.Mesh(icosphereGeometry, icosphereMaterial);
+        scene.add(icosphere);
+
+        // Add a plane (ground)
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+        const planeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x444444,
+            roughness: 0.9,
+            metalness: 0.5
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;  // Lay flat
+        plane.position.y = -6.5;          // Move below sphere
+        scene.add(plane);
+
+        // Ambient light (soft overall lighting)
+        const ambientLight = new THREE.AmbientLight(0xff5566, 0.5);
+        scene.add(ambientLight);
+
+        // Directional light (strong directional effect)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2);
+        directionalLight.position.set(5, 10, 7);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        scene.add(directionalLight);
+
+        // Point light (glowing effect near the object)
+        const pointLight = new THREE.PointLight(0xff8c00, 100, 10);
+        pointLight.position.set(0, 3, 3);
+        scene.add(pointLight);
+
+        // Spot light (focus on the icosphere)
+        const spotLight = new THREE.SpotLight(0xffbb77, 500);
+        spotLight.position.set(-0, 10, 0);
+        spotLight.angle = Math.PI / 6;  // Light cone size
+        spotLight.penumbra = 1;       // Soft edge
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        // Fog and shadow settings
+        renderer.shadowMap.enabled = true;
+        plane.receiveShadow = true;
+        icosphere.castShadow = true;
+
+        let angle = 0;
+        const radius = 8;
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            // Rotation animations
+            icosphere.rotation.y += 0.01;
+            icosphere.rotation.x += 0.005;
+
+            angle += 0.01;  // Adjust speed
+            camera.position.x = radius * Math.sin(angle);
+            camera.position.z = radius * Math.cos(angle);
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+        
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
 </body>
 </html>
