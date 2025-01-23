@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Hexagon with Three.js</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
+</head>
+<body>
+<script>
+    // Initialize the scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create a hexagonal prism geometry
+    const hexagonShape = new THREE.Shape();
+    for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        hexagonShape.lineTo(Math.cos(angle), Math.sin(angle));
+    }
+    hexagonShape.closePath();
+
+    const extrudeSettings = {
+        steps: 2,
+        depth: 1,
+        bevelEnabled: true,
+        bevelThickness: 0.2,
+        bevelSize: 0.2,
+        bevelSegments: 4
+    };
+    const geometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings);
+    
+    // Apply a standard material
+    const material = new THREE.MeshStandardMaterial({ color: 0x00ffcc, metalness: 0.5, roughness: 0.4 });
+    const hexagonMesh = new THREE.Mesh(geometry, material);
+    scene.add(hexagonMesh);
+
+    // Position the hexagon
+    hexagonMesh.position.set(0, 1, 0);
+    hexagonMesh.rotation.x = Math.PI / 6;
+
+    // Add a ground plane
+    const planeGeometry = new THREE.PlaneGeometry(10, 10);
+    const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.rotation.x = -Math.PI / 2;
+    planeMesh.position.y = 0;
+    scene.add(planeMesh);
+
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft ambient light
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(3, 5, 3);
+    scene.add(pointLight);
+
+    // Position the camera
+    camera.position.set(3, 2, 5);
+    camera.lookAt(0, 1, 0);
+
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // Rotate the hexagon
+        hexagonMesh.rotation.y += 0.01;
+        hexagonMesh.rotation.x += 0.005;
+
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+</body>
+</html>
