@@ -73,22 +73,18 @@ export default class World extends GameObject {
         this.addChild(new GameObject("fbxTest"));
 
         //#region fbxTest
-        try{
-        gameObject = this.findByName("fbxTest");
-        try{
-            await Utils.loadFBX('models/test.fbx', gameObject);
 
-            gameObject.body.traverse(child => {
-                if (child.isMesh) {
-                    child.material.side = THREE.DoubleSide;
-                    child.material.transparent = true;
-                    child.material.opacity = 0.2;
-                }
-            });
+        gameObject = this.findByName("fbxTest");
+        await Utils.loadFBX('models/test.fbx', gameObject);
+
+        gameObject.body.traverse(child => {
+            if (child.isMesh) {
+                child.material.side = THREE.DoubleSide;
+                child.material.transparent = true;
+                child.material.opacity = 0.2;
             }
-        catch{}
-        }
-        catch{}
+        });
+
         transform = gameObject.getComponent("Transform");
         transform.position.set(-2,-8, 2);
 
