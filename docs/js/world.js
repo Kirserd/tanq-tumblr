@@ -73,7 +73,7 @@ export default class World extends GameObject {
         this.addChild(new GameObject("fbxTest"));
 
         //#region fbxTest
-
+        try{
         gameObject = this.findByName("fbxTest");
         try{
             await Utils.loadFBX('models/test.fbx', gameObject);
@@ -87,7 +87,8 @@ export default class World extends GameObject {
             });
             }
         catch{}
-
+        }
+        catch{}
         transform = gameObject.getComponent("Transform");
         transform.position.set(-2,-8, 2);
 
