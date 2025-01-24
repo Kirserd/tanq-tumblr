@@ -75,7 +75,7 @@ export default class World extends GameObject {
         //#region fbxTest
 
         gameObject = this.findByName("fbxTest");
-        await Utils.loadFBX('../models/test.fbx', gameObject);
+        await Utils.loadFBX('../models/test.bin', gameObject);
 
         gameObject.body.traverse(child => {
             if (child.isMesh) {
