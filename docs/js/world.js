@@ -129,7 +129,7 @@ export default class World extends GameObject {
                 color: 0xff8c55,
                 metalness: 0.8,
                 roughness: 0.4,
-                emissive: 0x330011,
+                emissive: 0xff5555,
                 emissiveIntensity: 0.2
             })
         ));
@@ -147,7 +147,7 @@ export default class World extends GameObject {
                 color: 0x55bbff,
                 metalness: 0.8,
                 roughness: 0.4,
-                emissive: 0x330011,
+                emissive: 0x5555ff,
                 emissiveIntensity: 0.2
             })
         ));
@@ -165,7 +165,7 @@ export default class World extends GameObject {
                 color: 0xbb55ff,
                 metalness: 0.8,
                 roughness: 0.4,
-                emissive: 0x330011,
+                emissive: 0xbb55ff,
                 emissiveIntensity: 0.2
             })
         ));
