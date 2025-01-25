@@ -21,7 +21,7 @@ export default class Game{
 
     static setup(){
         Game.renderer.setSize(window.innerWidth, window.innerHeight);
-        Game.renderer.setClearColor(0x111111); 
+        Game.renderer.setClearColor(0x060108); 
         Game.renderer.shadowMap.enabled = true;
 
         document.body.appendChild(Game.renderer.domElement);
@@ -70,8 +70,10 @@ export default class Game{
         Game.focused = document.pointerLockElement == document.documentElement;
         document.getElementById("focus-message").classList = Game.focused? "hidden" : "none";
 
-        Game.controls.update();
-        Game.registered.forEach(registered => registered.update());
+        if(Game.focused){
+            Game.controls.update();
+            Game.registered.forEach(registered => registered.update());
+        }
         Game.renderer.render(Game.scene, Game.camera);
     }
 }

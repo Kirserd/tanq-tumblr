@@ -1,4 +1,4 @@
-import { GameObject, Game, Debug, Utils, Movement as Movement} from './package.js';
+import { GameObject, Game, Debug, Utils, Movement as Movement, Materials} from './package.js';
 import * as THREE from 'three';
 
 export default class World extends GameObject {
@@ -38,29 +38,26 @@ export default class World extends GameObject {
     _lightSetup(){
         const scene = Game.scene;
 
-        scene.fog = new THREE.Fog(0x111111, 5, 50); 
-        // Ambient light (soft overall lighting)
-        const ambientLight = new THREE.AmbientLight(0xff5566, 0.5);
+        scene.fog = new THREE.Fog(0x060108, 5, 50); 
+
+        const ambientLight = new THREE.AmbientLight(0x302535, 0.5);
         scene.add(ambientLight);
         
-        // Directional light (strong directional effect)
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2);
+        const directionalLight = new THREE.DirectionalLight(0x504070, 0.5);
         directionalLight.position.set(5, 10, 7);
         directionalLight.castShadow = true;
         directionalLight.shadow.mapSize.width = 1024;
         directionalLight.shadow.mapSize.height = 1024;
         scene.add(directionalLight);
         
-        // Point light (glowing effect near the object)
         const pointLight = new THREE.PointLight(0xff8c00, 100, 10);
         pointLight.position.set(0, 3, 3);
         scene.add(pointLight);
         
-        // Spot light (focus on the icosphere)
         const spotLight = new THREE.SpotLight(0xffbb77, 500);
         spotLight.position.set(-0, 10, 0);
-        spotLight.angle = Math.PI / 6;  // Light cone size
-        spotLight.penumbra = 1;       // Soft edge
+        spotLight.angle = Math.PI / 6;  
+        spotLight.penumbra = 1;       
         spotLight.castShadow = true;
         scene.add(spotLight); 
     }
@@ -131,11 +128,11 @@ export default class World extends GameObject {
         gameObject = this.findByName("plane");
         gameObject.addBody(new THREE.Mesh(
             new THREE.PlaneGeometry(2000, 2000), 
-            new THREE.MeshStandardMaterial({
-                color: 0x444444,
-                roughness: 0.9,
-                metalness: 0.5
-            })
+            await Materials.StandardMaterial(
+                'assets/floorMaterial', 
+                ["map", "roughnessMap", "metalnessMap", "normalMap"], 
+                200, 200,
+            )
         ));
         gameObject.transform.position.setY(-8);
         gameObject.transform.rotation.setX(-Math.PI / 2);  
