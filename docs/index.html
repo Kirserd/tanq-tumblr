@@ -8,6 +8,7 @@
         body { 
             margin: 0; 
             overflow: hidden; 
+            font-family: 'Helvetica Neue', sans-serif;
         }
         canvas { 
             display: block; 
@@ -21,10 +22,32 @@
             padding-left: 2.1rem; 
             color: rgb(180, 255, 220);
             text-shadow: 0 0 5px rgb(90, 180, 80), 0 0 15px rgb(20, 30, 10);
-            font-family: 'Helvetica Neue', sans-serif;
+
             font-size: 0.7rem;
             height: 90vh;
             overflow-y: hidden;
+            pointer-events: none;
+        }
+        #focus-message { 
+            z-index: 999; 
+            position: absolute; 
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            background-color: rgba(46, 46, 56, 0.5);
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 2rem;
+            color: rgba(231, 231, 255, 0.5);
+        }
+        .hidden{
+            display: none;
+            opacity: 0;
         }
     </style>
     <script type="importmap">
@@ -41,6 +64,7 @@
     <div id="debug-log">LOGGER:
         <br/>__________________________<br/><br/>
     </div>
+    <div id="focus-message">Click on screen</div>
     <script type="module" src="./js/init.js"></script>
 </body>
 </html>

@@ -21,10 +21,10 @@ export default class Movement extends Component {
         this.wobbleTime = 0;
 
         this.keys = {
-            ArrowUp: false,
-            ArrowDown: false,
-            ArrowLeft: false,
-            ArrowRight: false,
+            w: false,
+            s: false,
+            a: false,
+            d: false,
         };
 
         this.initInputListeners();
@@ -33,50 +33,43 @@ export default class Movement extends Component {
 
     initInputListeners() {
         window.addEventListener('keydown', (event) => {
+            if(!Game.focused)
+                return;
+
             if (this.keys.hasOwnProperty(event.key)) {
                 this.keys[event.key] = true;
             }
         });
 
         window.addEventListener('keyup', (event) => {
+            if(!Game.focused)
+                return;
+
             if (this.keys.hasOwnProperty(event.key)) {
                 this.keys[event.key] = false;
             }
         });
     }
 
-    initMouseListeners() {
-        // Lock the mouse to the center and hide it when mouse is moved
-        window.addEventListener('mousedown', () => {
-            // Lock the mouse to the center of the screen
-            if (document.documentElement.requestPointerLock) {
-                document.documentElement.requestPointerLock();
-            }
-        });
-    
-        // Handle mouse movement
+    initMouseListeners() {  
         window.addEventListener('mousemove', (event) => {
-            // Mouse movement relative to the center of the screen
+            if(!Game.focused)
+                return;
+
             this.rotationY -= event.movementX * this.mouseSensitivity; 
             this.rotationX -= event.movementY * this.mouseSensitivity; 
     
-            // Limit vertical rotation to prevent flipping
             this.rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.rotationX));
-        });
-    
-        // Exit pointer lock when the user presses 'ESC'
-        window.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                if (document.exitPointerLock) {
-                    document.exitPointerLock();
-                }
-            }
         });
     }
 
     update() {
         super.update();
         const deltaTime = Game.clock.getDelta();
+
+        if(!Game.focused)
+            return;
+
         const transform = this.gameObject.transform;
 
         const forward = {
@@ -91,19 +84,19 @@ export default class Movement extends Component {
         let moveX = 0;
         let moveZ = 0;
 
-        if (this.keys.ArrowUp) {
+        if (this.keys.w) {
             moveX += forward.x;
             moveZ += forward.z;
         }
-        if (this.keys.ArrowDown) {
+        if (this.keys.s) {
             moveX -= forward.x;
             moveZ -= forward.z;
         }
-        if (this.keys.ArrowLeft) {
+        if (this.keys.a) {
             moveX -= right.x;
             moveZ -= right.z;
         }
-        if (this.keys.ArrowRight) {
+        if (this.keys.d) {
             moveX += right.x;
             moveZ += right.z;
         }

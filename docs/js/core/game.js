@@ -10,6 +10,8 @@ export default class Game{
     static renderer = new THREE.WebGLRenderer({ antialias: true });
     static controls = new OrbitControls(this.camera, this.renderer.domElement);
 
+    static focused = false;
+
     static registered = new Map();
 
     constructor(){
@@ -24,17 +26,26 @@ export default class Game{
 
         document.body.appendChild(Game.renderer.domElement);
 
-        Game.controls.enableDamping = true; 
-        Game.controls.dampingFactor = 0.05;
-        Game.controls.enableZoom = true;     
-        Game.controls.autoRotate = false;    
-        Game.controls.target.set(0, 0, 0);
-
         window.addEventListener('resize', () => {
             Game.camera.aspect = window.innerWidth / window.innerHeight;
             Game.camera.updateProjectionMatrix();
             Game.renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
+        window.addEventListener('mousedown', () => {
+            if (document.documentElement.requestPointerLock) {
+                document.documentElement.requestPointerLock();
+            }
+        });
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (document.exitPointerLock) {
+                    document.exitPointerLock();
+                }
+            }
+        });
+        
     }
 
     static register(gameObject){
@@ -55,6 +66,9 @@ export default class Game{
 
     static update(){
         requestAnimationFrame(Game.update);
+
+        Game.focused = document.pointerLockElement == document.documentElement;
+        document.getElementById("focus-message").classList = Game.focused? "hidden" : "none";
 
         Game.controls.update();
         Game.registered.forEach(registered => registered.update());

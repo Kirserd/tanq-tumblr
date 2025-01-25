@@ -31,7 +31,6 @@ export default class World extends GameObject {
         this.findByName("camera").addBody(Game.camera);
         camera.transform.position.set(0,-3, 17);
 
-
         camera.addComponent(Movement);
         camera.getComponent("Movement").speed = 7.45;
     }
