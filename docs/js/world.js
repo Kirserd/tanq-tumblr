@@ -12,6 +12,22 @@ export default class World extends GameObject {
     switchCounter = 0.0;
     switchesDone = 0;
 
+    worldMode = "";
+    
+    //#region auroraGlitch
+    
+    auroraGlitchPrevState = 0;
+    aurora8 = Materials.textureLoader.load(`assets/aurora8.png`);
+    aurora7 = Materials.textureLoader.load(`assets/aurora7.png`);
+    aurora6 = Materials.textureLoader.load(`assets/aurora6.png`);
+    aurora5 = Materials.textureLoader.load(`assets/aurora5.png`);
+    aurora4 = Materials.textureLoader.load(`assets/aurora4.png`);
+    aurora3 = Materials.textureLoader.load(`assets/aurora3.png`);
+    aurora2 = Materials.textureLoader.load(`assets/aurora2.png`);
+    aurora1 = Materials.textureLoader.load(`assets/aurora1.png`);
+
+    //#endregion
+
     constructor() {
         super("World");
     }
@@ -217,6 +233,15 @@ export default class World extends GameObject {
     update(){
         super.update();
         this._updateSwitch();
+
+        switch (this.worldMode) {
+            case "auroraGlitch":
+                    this._auroraGlitch();
+                break;
+        
+            default:
+                break;
+        }
     }
 
     _updateSwitch() {
@@ -262,10 +287,42 @@ export default class World extends GameObject {
             }
         });
 
+        if(this.switchesDone % 2 == 1)
+            this.worldMode = "auroraGlitch";
+        else{
+            this.worldMode = "";
+            PostProcessing.starsPass.uniforms.starsTexture.value = Materials.textureLoader.load(
+                `assets/stars.png`
+            );
+        }
+
         this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 3;
 
-        PostProcessing.starsPass.uniforms.starsTexture.value = Materials.textureLoader.load(
-            `assets/${this.switchesDone % 2 == 0? "stars.png" : "stars2.png"}`
-        );
+        
+    }
+
+    _auroraGlitch(){
+        let state = Math.round(this.switchCounter * 12) % 9;
+        if(this.auroraGlitchPrevState == state)
+            return;
+
+        Debug.log(state);
+        this.auroraGlitchPrevState = state;
+        if(state >= 7)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora8;
+        else if(state >= 6)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora7;
+        else if(state >= 5)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora6;
+        else if(state >= 4)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora5;
+        else if(state >= 3)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora4;
+        else if(state >= 2)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora3;
+        else if(state >= 1)
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora2;
+        else
+            PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora1;
     }
 }
