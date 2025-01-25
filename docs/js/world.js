@@ -1,6 +1,7 @@
 import { 
     GameObject, Game, Debug, Utils, Movement,
-    Materials, PostProcessing} from './package.js';
+    Materials, PostProcessing,
+    Rotating} from './package.js';
 import * as THREE from 'three';
 
 export default class World extends GameObject {
@@ -35,7 +36,7 @@ export default class World extends GameObject {
         const camera = this.findByName("cameraPivot");
         camera.addChild(new GameObject("camera"));
         this.findByName("camera").addBody(Game.camera);
-        camera.transform.position.set(0,-3, 17);
+        camera.transform.position.set(0,-3, 88);
 
         camera.addComponent(Movement);
         camera.getComponent("Movement").speed = 9.45;
@@ -47,12 +48,8 @@ export default class World extends GameObject {
         const scene = Game.scene;
 
         const pointLight = new THREE.PointLight(0xbb8c55, 100, 100);
-        pointLight.position.set(0, 3, 3);
+        pointLight.position.set(0, 2, 3);
         scene.add(pointLight);
-
-        const pointLight2 = new THREE.PointLight(0x558cbb, 500, 40);
-        pointLight2.position.set(-10, 3, 1);
-        scene.add(pointLight2);
         
         const spotLight = new THREE.SpotLight(0xffbb77, 500);
         spotLight.position.set(-0, 10, 0);
@@ -60,8 +57,34 @@ export default class World extends GameObject {
         spotLight.penumbra = 1;       
         spotLight.castShadow = true;
         scene.add(spotLight); 
+
+        const pointLight2 = new THREE.PointLight(0x558cbb, 100, 100);
+        pointLight2.position.set(-40, 2, 13);
+        scene.add(pointLight2);
+
+        const spotLight2 = new THREE.SpotLight(0x77bbff, 500);
+        spotLight2.position.set(-40, 10, 10);
+        spotLight2.angle = Math.PI / 6;  
+        spotLight2.penumbra = 1;       
+        spotLight2.castShadow = true;
+        spotLight2.target.position.set(-40, 0, 10);
+        scene.add(spotLight2); 
+        scene.add(spotLight2.target);
+
+        const pointLight3 = new THREE.PointLight(0x8c55bb, 100, 100);
+        pointLight3.position.set(40, 2, 13);
+        scene.add(pointLight3);
+
+        const spotLight3 = new THREE.SpotLight(0xbb77ff, 500);
+        spotLight3.position.set(40, 10, 10);
+        spotLight3.angle = Math.PI / 6;  
+        spotLight3.penumbra = 1;       
+        spotLight3.castShadow = true;
+        spotLight3.target.position.set(40, 0, 10);
+        scene.add(spotLight3); 
+        scene.add(spotLight3.target);
         
-        const playerPointLight = new THREE.PointLight(0xbb8c55, 80, 50);
+        const playerPointLight = new THREE.PointLight(0xbb8c55, 80, 15);
         playerPointLight.position.set(0, 2, 0);
         this.findByName("cameraPivot").body.add(playerPointLight);
     }
@@ -74,6 +97,10 @@ export default class World extends GameObject {
 
         this.addChild(new GameObject("icosphere"));
         this.findByName("icosphere").addChild(new GameObject("icosphereSmaller"));
+
+        this.addChild(new GameObject("icosphere2"));
+        this.addChild(new GameObject("icosphere3"));
+
         this.addChild(new GameObject("ground"));
         this.addChild(new GameObject("fbxTest"));
 
@@ -99,7 +126,7 @@ export default class World extends GameObject {
         gameObject.addBody(new THREE.Mesh(
             new THREE.IcosahedronGeometry(2, 0), 
             new THREE.MeshStandardMaterial({
-                color: 0xff8c00,
+                color: 0xff8c55,
                 metalness: 0.8,
                 roughness: 0.4,
                 emissive: 0x330011,
@@ -107,6 +134,43 @@ export default class World extends GameObject {
             })
         ));
         gameObject.transform.position.set(0,0,0);
+        gameObject.addComponent(Rotating);
+
+        //#endregion
+
+        //#region icosphere2
+
+        gameObject = this.findByName("icosphere2");
+        gameObject.addBody(new THREE.Mesh(
+            new THREE.IcosahedronGeometry(2, 0), 
+            new THREE.MeshStandardMaterial({
+                color: 0x55bbff,
+                metalness: 0.8,
+                roughness: 0.4,
+                emissive: 0x330011,
+                emissiveIntensity: 0.2
+            })
+        ));
+        gameObject.transform.position.set(-40,0,10);
+        gameObject.addComponent(Rotating);
+
+        //#endregion
+
+        //#region icosphere3
+
+        gameObject = this.findByName("icosphere3");
+        gameObject.addBody(new THREE.Mesh(
+            new THREE.IcosahedronGeometry(2, 0), 
+            new THREE.MeshStandardMaterial({
+                color: 0xbb55ff,
+                metalness: 0.8,
+                roughness: 0.4,
+                emissive: 0x330011,
+                emissiveIntensity: 0.2
+            })
+        ));
+        gameObject.transform.position.set(40,0,10);
+        gameObject.addComponent(Rotating);
 
         //#endregion
 

@@ -6,6 +6,7 @@ export { default as World } from './world.js'
 export { default as Component } from './core/component.js'
 export { default as Transform } from './components/transform.js'
 export { default as Movement} from './components/movement.js'
+export { default as Rotating } from './components/rotating.js'
 
 export { default as Debug } from './debug.js'
 export { default as Utils } from './utils.js'
