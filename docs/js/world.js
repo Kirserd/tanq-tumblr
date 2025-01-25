@@ -87,6 +87,11 @@ export default class World extends GameObject {
         const playerPointLight = new THREE.PointLight(0xbb8c55, 80, 15);
         playerPointLight.position.set(0, 2, 0);
         this.findByName("cameraPivot").body.add(playerPointLight);
+
+        this.addChild(new GameObject("WorldLight"));
+        const ambientlight = new THREE.AmbientLight( 0x407099, 0 ); 
+        this.findByName("WorldLight").body = ambientlight;
+        scene.add( ambientlight );
     }
 
     async _sceneSetup(){
@@ -256,5 +261,7 @@ export default class World extends GameObject {
                 child.material.map = texture;
             }
         });
+
+        this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 1;
     }
 }
