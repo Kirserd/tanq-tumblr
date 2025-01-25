@@ -9,4 +9,8 @@ export { default as Movement} from './components/movement.js'
 
 export { default as Debug } from './debug.js'
 export { default as Utils } from './utils.js'
+
 export { default as Materials } from './shaders/materials.js'
+export { default as PostProcessing } from './shaders/postProcessing.js'
+
+export { default as CustomPasses } from './shaders/customPasses.js'

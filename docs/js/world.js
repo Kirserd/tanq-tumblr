@@ -1,9 +1,15 @@
-import { GameObject, Game, Debug, Utils, Movement as Movement, Materials} from './package.js';
+import { 
+    GameObject, Game, Debug, Utils, Movement,
+    Materials, PostProcessing} from './package.js';
 import * as THREE from 'three';
 
 export default class World extends GameObject {
 
     static debug = true;
+
+    switchPeriod = 5.0;
+    switchCounter = 0.0;
+    switchesDone = 0;
 
     constructor() {
         super("World");
@@ -32,18 +38,16 @@ export default class World extends GameObject {
         camera.transform.position.set(0,-3, 17);
 
         camera.addComponent(Movement);
-        camera.getComponent("Movement").speed = 7.45;
+        camera.getComponent("Movement").speed = 9.45;
     }
 
     _lightSetup(){
         const scene = Game.scene;
 
-        scene.fog = new THREE.Fog(0x060108, 5, 50); 
-
-        const ambientLight = new THREE.AmbientLight(0x302535, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffdd99, 1);
         scene.add(ambientLight);
         
-        const directionalLight = new THREE.DirectionalLight(0x504070, 0.5);
+        const directionalLight = new THREE.DirectionalLight(0x504070, 5);
         directionalLight.position.set(5, 10, 7);
         directionalLight.castShadow = true;
         directionalLight.shadow.mapSize.width = 1024;
@@ -70,7 +74,7 @@ export default class World extends GameObject {
 
         this.addChild(new GameObject("icosphere"));
         this.findByName("icosphere").addChild(new GameObject("icosphereSmaller"));
-        this.addChild(new GameObject("plane"));
+        this.addChild(new GameObject("ground"));
         this.addChild(new GameObject("fbxTest"));
 
         //#region fbxTest
@@ -81,7 +85,7 @@ export default class World extends GameObject {
             if (child.isMesh) {
                 child.material.side = THREE.DoubleSide;
                 child.material.transparent = true;
-                child.material.opacity = 0.2;
+                child.material.opacity = 0.3;
             }
         });
 
@@ -123,21 +127,71 @@ export default class World extends GameObject {
 
         //#endregion
 
-        //#region plane
+        //#region ground
 
-        gameObject = this.findByName("plane");
+        gameObject = this.findByName("ground");
         gameObject.addBody(new THREE.Mesh(
-            new THREE.PlaneGeometry(2000, 2000), 
+            new THREE.PlaneGeometry(20000, 20000), 
             await Materials.StandardMaterial(
                 'assets/floorMaterial', 
                 ["map", "roughnessMap", "metalnessMap", "normalMap"], 
-                200, 200,
+                2000, 2000,
             )
         ));
         gameObject.transform.position.setY(-8);
         gameObject.transform.rotation.setX(-Math.PI / 2);  
 
         //#endregion
+        
+    }
+
+    update(){
+        super.update();
+
+        this._updateSwitch();
+    }
+
+    _updateSwitch() {
+        if (isNaN(this.switchCounter)) {
+            this.switchCounter = 0;  // Set initial value to 0
+        }
+
+        if (this.switchCounter >= this.switchPeriod + 0.3) {
+            this.switchCounter = 0;
+            this.switchesDone++;
+            this._updateWorld();
+        } 
+        else {
+            let switchStage = this.switchCounter - this.switchPeriod;
+    
+            if (switchStage >= 0.3) {
+                PostProcessing.glitchPass.curF = 0.1;
+            } else if (switchStage >= 0.2) {
+                PostProcessing.glitchPass.curF = 0;
+            } else if (switchStage >= 0.1) {
+                PostProcessing.glitchPass.curF = 0.1;
+            } else {
+                PostProcessing.glitchPass.curF = 0.2;
+            }
+    
+            PostProcessing.glitchPass.randX = 1;
+        }
+    
+        this.switchCounter += Game.deltaTime;
+    }
+
+    _updateWorld(){
+        this.findByName("ground").body.traverse(child => {
+            if (child.isMesh) {
+                let texture = Materials.textureLoader.load(`assets/${
+                    this.switchesDone % 2 == 0? "floorMaterial" : "floor2Material"
+                }/albedo.png`);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(2000, 2000); 
+
+                child.material.map = texture;
+            }
+        });
     }
 }
-
