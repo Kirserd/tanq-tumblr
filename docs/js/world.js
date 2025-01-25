@@ -105,7 +105,7 @@ export default class World extends GameObject {
         this.findByName("cameraPivot").body.add(playerPointLight);
 
         this.addChild(new GameObject("WorldLight"));
-        const ambientlight = new THREE.AmbientLight( 0x607099, 0 ); 
+        const ambientlight = new THREE.AmbientLight( 0x998892, 0 ); 
         this.findByName("WorldLight").body = ambientlight;
         scene.add( ambientlight );
     }
@@ -296,7 +296,7 @@ export default class World extends GameObject {
             );
         }
 
-        this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 3;
+        this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 5;
 
         
     }
@@ -306,7 +306,6 @@ export default class World extends GameObject {
         if(this.auroraGlitchPrevState == state)
             return;
 
-        Debug.log(state);
         this.auroraGlitchPrevState = state;
         if(state >= 7)
             PostProcessing.starsPass.uniforms.starsTexture.value = this.aurora8;

@@ -1,4 +1,5 @@
 import { Component, Debug, Game } from '../package.js';
+import * as THREE from 'three';
 
 export default class Movement extends Component {
     constructor(gameObject) {
@@ -128,12 +129,15 @@ export default class Movement extends Component {
         let tiltX = -this.velocity.z * this.rotationFactor; 
         let tiltZ = this.velocity.x * this.rotationFactor;
 
+        const tiltVector = new THREE.Vector3(tiltZ, 0, tiltX);
+        tiltVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.rotationY);
+
         transform.rotation.set(
-            tiltX,    
+            0, 
             this.rotationY, 
-            tiltZ    
+            tiltVector.x 
         );
-        this.cameraObject.transform.rotation.set(this.rotationX, 0, 0);
+        this.cameraObject.transform.rotation.set(this.rotationX + tiltVector.z, 0, 0);
 
         if (magnitude > 0) {
             this.wobbleTime += deltaTime * this.wobbleSpeed;
