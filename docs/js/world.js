@@ -39,24 +39,20 @@ export default class World extends GameObject {
 
         camera.addComponent(Movement);
         camera.getComponent("Movement").speed = 9.45;
+
+        Game.scene.add(camera.body);
     }
 
     _lightSetup(){
         const scene = Game.scene;
 
-        const ambientLight = new THREE.AmbientLight(0xffdd99, 1);
-        scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0x504070, 5);
-        directionalLight.position.set(5, 10, 7);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 1024;
-        directionalLight.shadow.mapSize.height = 1024;
-        scene.add(directionalLight);
-        
-        const pointLight = new THREE.PointLight(0xff8c00, 100, 10);
+        const pointLight = new THREE.PointLight(0xbb8c55, 100, 100);
         pointLight.position.set(0, 3, 3);
         scene.add(pointLight);
+
+        const pointLight2 = new THREE.PointLight(0x558cbb, 500, 40);
+        pointLight2.position.set(-10, 3, 1);
+        scene.add(pointLight2);
         
         const spotLight = new THREE.SpotLight(0xffbb77, 500);
         spotLight.position.set(-0, 10, 0);
@@ -64,6 +60,10 @@ export default class World extends GameObject {
         spotLight.penumbra = 1;       
         spotLight.castShadow = true;
         scene.add(spotLight); 
+        
+        const playerPointLight = new THREE.PointLight(0xbb8c55, 80, 50);
+        playerPointLight.position.set(0, 2, 0);
+        this.findByName("cameraPivot").body.add(playerPointLight);
     }
 
     async _sceneSetup(){
@@ -147,7 +147,6 @@ export default class World extends GameObject {
 
     update(){
         super.update();
-
         this._updateSwitch();
     }
 
