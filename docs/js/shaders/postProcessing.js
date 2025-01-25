@@ -43,7 +43,7 @@ export default class PostProcessing{
         this.composer.addPass(bloomPass);
 
         const filmPass = new FilmPass(
-            0.15,  // Intensity of noise
+            0.55,  // Intensity of noise
             0.5, // Scanline intensity
             240,   // Scanline count
             false  // Grayscale

@@ -39,10 +39,16 @@
             background-color: rgba(46, 46, 56, 0.5);
             pointer-events: none;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
 
             font-size: 2rem;
+            color: rgba(231, 231, 255, 0.5);
+        }
+        #focus-message *{
+            font-size: 1.2rem;
+            border-color: rgba(231, 231, 255, 0.5);
             color: rgba(231, 231, 255, 0.5);
         }
         .hidden{
@@ -63,7 +69,9 @@
     <div id="debug-log">LOGGER:
         <br/>__________________________<br/><br/>
     </div>
-    <div id="focus-message">Click on screen</div>
+    <div id="focus-message"><br /><br /><br /><br />Click on screen<hr width="220rem"/><p>
+        <br />&nbsp;&nbsp;&nbsp;&nbsp;Use [WASD] to walk 
+        <br/>&nbsp;&nbsp;&nbsp;&nbsp;Use [MOUSE] to look around.</p></div>
     <script type="module" src="./js/init.js"></script>
 </body>
 </html>
