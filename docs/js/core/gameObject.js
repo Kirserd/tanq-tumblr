@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { Debug, Game, Transform } from '../package.js';
 
 export default class GameObject {
@@ -6,13 +7,15 @@ export default class GameObject {
 
     //#region PROPERTIES
 
-    constructor(name) {
+    constructor(name, bodyless=false) {
         this.name = name;
         this.parent = null;
-        this.body = null;
+        this.body = bodyless? null : new THREE.Object3D();
 
         this.children = new Map();  
         this.components = new Map(); 
+
+        this.Transform = null;
 
         Game.register(this);
         this._initNecessaries();
@@ -27,6 +30,7 @@ export default class GameObject {
 
     _initNecessaries(){
         this.addComponent(Transform);
+        this.transform = this.getComponent("Transform");
     }
 
     //#endregion
@@ -94,8 +98,9 @@ export default class GameObject {
         this.body.castShadow = true;
         this.body.receiveShadow = true;
 
-        if(this.parent && this.parent.body)
+        if(this.parent && this.parent.body){
             this.parent.body.add(body);
+        }
         else{
             Game.scene.add(body);
         }

@@ -25,6 +25,12 @@ export default class Debug {
 
         let currentLines = Debug.logHTML.querySelectorAll('br').length;
 
+        if (currentLines >= Debug.maxLines*2 ) { 
+            let lines = Debug.logHTML.innerHTML.split('<br>');
+            lines.splice(0, 10);
+            Debug.logHTML.innerHTML = lines.join('<br/>');
+        }
+
         if (currentLines >= Debug.maxLines ) { 
             let lines = Debug.logHTML.innerHTML.split('<br>');
             lines.splice(0, 1);

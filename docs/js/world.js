@@ -1,4 +1,4 @@
-import { GameObject, Game, Debug, Utils } from './package.js';
+import { GameObject, Game, Debug, Utils, Movement as Movement} from './package.js';
 import * as THREE from 'three';
 
 export default class World extends GameObject {
@@ -25,10 +25,15 @@ export default class World extends GameObject {
     }
 
     _cameraSetup(){
-        const camera = Game.camera;
+        this.addChild(new GameObject("cameraPivot"));
+        const camera = this.findByName("cameraPivot");
+        camera.addChild(new GameObject("camera"));
+        this.findByName("camera").addBody(Game.camera);
+        camera.transform.position.set(0,-3, 17);
 
-        camera.position.set(5, 3, 8);
-        camera.lookAt(0, 0, 0);
+
+        camera.addComponent(Movement);
+        camera.getComponent("Movement").speed = 7.45;
     }
 
     _lightSetup(){
@@ -76,7 +81,6 @@ export default class World extends GameObject {
 
         gameObject = this.findByName("fbxTest");
         await Utils.loadFBX('models/test.fbx', gameObject);
-
         gameObject.body.traverse(child => {
             if (child.isMesh) {
                 child.material.side = THREE.DoubleSide;
@@ -85,8 +89,7 @@ export default class World extends GameObject {
             }
         });
 
-        transform = gameObject.getComponent("Transform");
-        transform.position.set(-2,-8, 2);
+       gameObject.transform.position.set(-2,-8, 2);
 
         //#endregion
 
@@ -102,9 +105,8 @@ export default class World extends GameObject {
                 emissive: 0x330011,
                 emissiveIntensity: 0.2
             })
-            ));
-        transform = gameObject.getComponent("Transform");
-        transform.position.set(0,0,0);
+        ));
+        gameObject.transform.position.set(0,0,0);
 
         //#endregion
 
@@ -120,9 +122,8 @@ export default class World extends GameObject {
                 emissive: 0x330011,
                 emissiveIntensity: 0.2
             })
-            ));
-        transform = gameObject.getComponent("Transform");
-        transform.position.set(1,2,-3);
+        ));
+        gameObject.transform.position.set(1,2,-3);
 
         //#endregion
 
@@ -136,10 +137,9 @@ export default class World extends GameObject {
                 roughness: 0.9,
                 metalness: 0.5
             })
-            ));
-        transform = gameObject.getComponent("Transform");
-        transform.position.setY(-8);
-        transform.rotation.setX(-Math.PI / 2);  
+        ));
+        gameObject.transform.position.setY(-8);
+        gameObject.transform.rotation.setX(-Math.PI / 2);  
 
         //#endregion
     }

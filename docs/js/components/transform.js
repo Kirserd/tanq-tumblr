@@ -32,4 +32,11 @@ export default class Transform extends Component {
             );
         }
     }
+
+    lookAt(target) {
+        if(!this.gameObject.body)
+            return;
+
+        this.gameObject.body.lookAt(target);
+    }
 }

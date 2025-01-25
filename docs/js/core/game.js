@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 export default class Game{
+    static clock = new THREE.Clock(true);
     static scene = new THREE.Scene();
     static camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     static renderer = new THREE.WebGLRenderer({ antialias: true });
