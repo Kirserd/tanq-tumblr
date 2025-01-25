@@ -45,7 +45,9 @@ export default class CustomPasses {
                 depthTexture: { value: Game.depthTexture },
                 cameraNear: { value: 0.1 },
                 cameraFar: { value: 100 },
-                cameraDirection: { value: new THREE.Vector3(0, 0, -1) } 
+                cameraDirection: { value: new THREE.Vector3(0, 0, -1) },
+                scale: { value: 1.5 }, // Scale factor for the image size
+                offset: { value: new THREE.Vector2(0.0, 0.0) } // Offset for traversal
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -61,31 +63,36 @@ export default class CustomPasses {
                 uniform sampler2D depthTexture;
                 uniform float cameraNear;
                 uniform float cameraFar;
-                uniform vec3 cameraDirection; 
+                uniform vec3 cameraDirection;
+                uniform float scale;
+                uniform vec2 offset;
     
                 float linearizeDepth(float depth) {
                     float z = depth * 2.0 - 1.0;
                     return (2.0 * cameraNear * cameraFar) / (cameraFar + cameraNear - z * (cameraFar - cameraNear));
                 }
     
-               void main() {
-                vec2 shiftedUV = vUv;
-                float angle = atan(cameraDirection.z, cameraDirection.x); 
-
-                float u = (angle + 3.14159265359) / (2.0 * 3.14159265359); 
-
-                shiftedUV.x += u * 2.0; 
-
-                shiftedUV = mod(shiftedUV, 0.5);
-
-                vec4 starsColor = texture2D(starsTexture, shiftedUV);
-                vec4 blitColor = texture2D(blitTexture, vUv);
-
-                float depth = texture2D(depthTexture, vUv).r;
-                float linearDepth = linearizeDepth(depth) / cameraFar;
-
-                gl_FragColor = mix(blitColor, starsColor, clamp(linearDepth, 0.0, 1.0));
-            }
+                void main() {
+                    // Scale and offset the UV coordinates
+                    vec2 scaledUV = (vUv - 0.5) / scale + 0.5 + offset;
+    
+                    // Calculate shifted UV for the stars texture
+                    vec2 shiftedUV = scaledUV;
+                    float angle = atan(cameraDirection.z, cameraDirection.x);
+                    float u = (angle + 3.14159265359) / (2.0 * 3.14159265359);
+                    shiftedUV.x += u;
+    
+                    // Wrap the UV coordinates to avoid tiling
+                    shiftedUV = fract(shiftedUV);
+    
+                    vec4 starsColor = texture2D(starsTexture, shiftedUV);
+                    vec4 blitColor = texture2D(blitTexture, vUv);
+    
+                    float depth = texture2D(depthTexture, vUv).r;
+                    float linearDepth = linearizeDepth(depth) / cameraFar;
+    
+                    gl_FragColor = mix(blitColor, starsColor, clamp(linearDepth, 0.0, 1.0));
+                }
             `,
         });
     }

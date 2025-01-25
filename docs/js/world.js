@@ -89,7 +89,7 @@ export default class World extends GameObject {
         this.findByName("cameraPivot").body.add(playerPointLight);
 
         this.addChild(new GameObject("WorldLight"));
-        const ambientlight = new THREE.AmbientLight( 0x407099, 0 ); 
+        const ambientlight = new THREE.AmbientLight( 0x607099, 0 ); 
         this.findByName("WorldLight").body = ambientlight;
         scene.add( ambientlight );
     }
@@ -221,7 +221,7 @@ export default class World extends GameObject {
 
     _updateSwitch() {
         if (isNaN(this.switchCounter)) {
-            this.switchCounter = 0;  // Set initial value to 0
+            this.switchCounter = 0; 
         }
 
         if (this.switchCounter >= this.switchPeriod + 0.3) {
@@ -262,6 +262,10 @@ export default class World extends GameObject {
             }
         });
 
-        this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 1;
+        this.findByName("WorldLight").body.intensity = this.switchesDone % 2 == 0? 0 : 3;
+
+        PostProcessing.starsPass.uniforms.starsTexture.value = Materials.textureLoader.load(
+            `assets/${this.switchesDone % 2 == 0? "stars.png" : "stars2.png"}`
+        );
     }
 }
