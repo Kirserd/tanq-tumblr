@@ -29,7 +29,7 @@ export default class PostProcessing{
         this.composer.addPass(this.starsPass);
 
         this.glitchPass = new GlitchPass(8);
-        this.composer.addPass(this.glitchPass );
+        this.composer.addPass(this.glitchPass);
 
         const smaaPass = new SMAAPass(window.innerWidth, window.innerHeight);
         this.composer.addPass(smaaPass);

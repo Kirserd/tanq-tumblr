@@ -183,7 +183,7 @@ export default class World extends GameObject {
                 color: 0x008cff,
                 metalness: 1,
                 roughness: 0.3,
-                emissive: 0x330011,
+                emissive: 0x008cff,
                 emissiveIntensity: 0.2
             })
         ));
