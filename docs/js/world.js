@@ -212,6 +212,80 @@ export default class World extends GameObject {
 
         //#endregion
 
+        //#region artwork 1
+
+        async function initArtwork(world, no, path, posX, posY, posZ, rotY){
+            world.addChild(new GameObject(`artwork${no}_1`));
+
+            gameObject = world.findByName(`artwork${no}_1`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 5), 
+                await Materials.ArtworkMaterial(`assets/art_1/${path}.png`)
+            ));
+            gameObject.transform.position.setX(posX);
+            gameObject.transform.position.setZ(posZ);
+            gameObject.transform.position.setY(posY);
+            gameObject.transform.rotation.setY(rotY);  
+        }
+        async function artworkLayer(world, no, layer, path){
+            world.findByName(`artwork${no}_${layer-1}`).addChild(new GameObject(`artwork${no}_${layer}`));
+
+            gameObject = world.findByName(`artwork${no}_${layer}`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 5), 
+                await Materials.ArtworkMaterial(`assets/art_${no}/${path}.png`)
+            ));
+            gameObject.transform.position.setZ(0.6); 
+            gameObject.body.scale.set(1.05,1.05,1.0); 
+        }
+        async function artworkCaption(world, no, text, width, height, xOffset, yOffset, bgColor, textStyle){ 
+            world.findByName(`artwork${no}_1`).addChild(new GameObject(`artwork${no}_caption`));
+            let material = await Materials.CaptionMaterial(text,width,height,xOffset,yOffset,bgColor='black',textStyle);
+
+            gameObject = world.findByName(`artwork${no}_caption`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 1), 
+                material
+            ));
+            gameObject.transform.position.setZ(-2.5); 
+            gameObject.transform.position.setY(-2); 
+            gameObject.transform.rotation.setY(Math.PI);  
+            gameObject.transform.rotation.setX(Math.PI / 4);  
+            gameObject.body.scale.set(1.05,1.05,1.0); 
+
+            function trace(gameObject, material, count){
+                let trace = new THREE.Mesh(
+                    new THREE.PlaneGeometry(5, 1), 
+                    material.clone(),
+                );
+                trace.traverse(child => {
+                    if (child.isMesh) {child.material.opacity = 0.8 - 0.1 * count;}
+                });
+                gameObject.body.add(trace);
+                trace.position.setZ(count * -0.15);
+            }
+
+            trace(gameObject, material, 1);
+            trace(gameObject, material, 2);
+            trace(gameObject, material, 3);
+            trace(gameObject, material, 4);
+            trace(gameObject, material, 5);
+            trace(gameObject, material, 6);
+            trace(gameObject, material, 7);
+        }
+
+        await initArtwork(this, 1, 5, -8, -3, 74, -Math.PI / 2);
+        await artworkLayer(this, 1, 2, 6);
+        await artworkLayer(this, 1, 3, 4);
+        await artworkLayer(this, 1, 4, 1);
+        await artworkLayer(this, 1, 5, 2);
+        await artworkLayer(this, 1, 6, 3);
+        await artworkCaption(this, 1, `"[Peer] [pr-E55(sure)]"`, 512, 128, 20, 72, 'black', { 
+            shadowColor: "rgba(185, 60, 255, 1)"
+        });
+
+        //#endregion
+
         //#region ground
 
         gameObject = this.findByName("ground");
@@ -227,7 +301,7 @@ export default class World extends GameObject {
         gameObject.transform.rotation.setX(-Math.PI / 2);  
 
         //#endregion
-        
+
     }
 
     update(){

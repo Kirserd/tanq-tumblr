@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export default class Game {
     static clock = new THREE.Clock(true);
     static scene = new THREE.Scene();
-    static camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    static camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     static renderer = new THREE.WebGLRenderer();
     static controls = new OrbitControls(this.camera, this.renderer.domElement);
 
@@ -23,6 +23,8 @@ export default class Game {
 
     static deltaTime;
     static oldTime;
+
+    static firstFrame = true;
 
     constructor(){
         Game.setup();
@@ -91,10 +93,10 @@ export default class Game {
         Game.focused = document.pointerLockElement == document.documentElement;
         document.getElementById("focus-message").classList = Game.focused ? "hidden" : "none";
 
-        if(Game.focused){
+        if(Game.focused || Game.firstFrame){
             Game.controls.update();
-            Game.registered.forEach(registered => registered.update());
         }
+        Game.registered.forEach(registered => registered.update());
 
         Game.updatePasses();
 
