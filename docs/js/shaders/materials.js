@@ -85,8 +85,7 @@ export default class Materials {
         const materialOptions = {
             map: texture,
             side: THREE.DoubleSide,
-            transparent: true,
-            alphaTest: 0.5
+            transparent: true
         };
         return new THREE.MeshBasicMaterial(materialOptions);
     }
