@@ -9,7 +9,6 @@ export default class Game {
     static camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     static renderer = new THREE.WebGLRenderer();
     static controls = new OrbitControls(this.camera, this.renderer.domElement);
-    static stats = new Stats();
 
     static depthTexture = new THREE.DepthTexture();
     static renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
@@ -67,8 +66,6 @@ export default class Game {
                 }
             }
         });
-
-        document.body.appendChild(Game.stats.dom);
     }
 
     static register(gameObject){
@@ -109,8 +106,6 @@ export default class Game {
         Game.renderer.setRenderTarget(null);
 
         PostProcessing.composer.render();
-
-        Game.stats.update();
     }
 
     static updatePasses() {

@@ -32,14 +32,14 @@ export default class World extends GameObject {
         super("World");
     }
 
-    start() {    
+    async start() {    
         super.start();
 
         this.addBody(new THREE.Object3D());
 
         this._cameraSetup();
         this._lightSetup();
-        this._sceneSetup();
+        await this._sceneSetup();
 
         if(World.debug){
             Debug.log(this.logComponents());
@@ -111,6 +111,100 @@ export default class World extends GameObject {
     }
 
     async _sceneSetup(){
+
+        async function initArtwork(world, no, path, posX, posY, posZ, rotY){
+            world.addChild(new GameObject(`artwork${no}_1`));
+
+            const layers = 16;
+            const layerOpacityFalloff = 1 / layers;
+            const layerOffset = -0.025;
+            let material = await Materials.ArtworkMaterial(`assets/art_${no}/${path}.png`);
+
+            gameObject = world.findByName(`artwork${no}_1`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 5), 
+                material
+            ));
+            gameObject.transform.position.setX(posX);
+            gameObject.transform.position.setZ(posZ);
+            gameObject.transform.position.setY(posY);
+            gameObject.transform.rotation.setY(rotY); 
+            
+            for (let index = 0; index < layers ; index++) {
+                let trace = new THREE.Mesh(
+                    new THREE.PlaneGeometry(5, 5), 
+                    await material.clone(),
+                );
+                trace.traverse(child => {
+                    if (child.isMesh) {child.material.opacity = 1 - layerOpacityFalloff * index;}
+                });
+                gameObject.body.add(trace);
+                trace.position.setZ(index * layerOffset);
+            }
+        }
+        async function artworkLayer(world, no, layer, path){
+            world.findByName(`artwork${no}_${layer-1}`).addChild(new GameObject(`artwork${no}_${layer}`));
+
+            const layers = 16;
+            const layerOpacityFalloff = 1 / layers;
+            const layerOffset = -0.025;
+            let material = await Materials.ArtworkMaterial(`assets/art_${no}/${path}.png`);
+
+            gameObject = world.findByName(`artwork${no}_${layer}`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 5), 
+                material
+            ));
+            gameObject.transform.position.setZ(-0.4); 
+            gameObject.body.scale.set(1.025,1.025,1.0); 
+
+            for (let index = 0; index < layers ; index++) {
+                let trace = new THREE.Mesh(
+                    new THREE.PlaneGeometry(5, 5), 
+                    material.clone(),
+                );
+                trace.traverse(child => {
+                    if (child.isMesh) {child.material.opacity = 1 - layerOpacityFalloff * index;}
+                });
+                gameObject.body.add(trace);
+                trace.position.setZ(index * layerOffset);
+            }
+        }
+        async function artworkCaption(world, no, text, width, height, xOffset, yOffset, bgColor='black', textStyle){ 
+            world.findByName(`artwork${no}_1`).addChild(new GameObject(`artwork${no}_caption`));
+            let material = await Materials.CaptionMaterial(text,width,height,xOffset,yOffset,bgColor,textStyle);
+
+            gameObject = world.findByName(`artwork${no}_caption`);
+            gameObject.addBody(new THREE.Mesh(
+                new THREE.PlaneGeometry(5, 1), 
+                material
+            ));
+            gameObject.transform.position.setZ(2.5); 
+            gameObject.transform.position.setY(-2.5); 
+            gameObject.transform.rotation.setX(-Math.PI / 4);  
+            gameObject.body.scale.set(1.05,1.05,1.0); 
+
+            function trace(gameObject, material, count){
+                let trace = new THREE.Mesh(
+                    new THREE.PlaneGeometry(5, 1), 
+                    material.clone(),
+                );
+                trace.traverse(child => {
+                    if (child.isMesh) {child.material.opacity = 0.8 - 0.1 * count;}
+                });
+                gameObject.body.add(trace);
+                trace.position.setZ(count * -0.05);
+            }
+
+            trace(gameObject, material, 1);
+            trace(gameObject, material, 2);
+            trace(gameObject, material, 3);
+            trace(gameObject, material, 4);
+            trace(gameObject, material, 5);
+            trace(gameObject, material, 6);
+            trace(gameObject, material, 7);
+        }
+        
         let transform = this.getComponent("Transform");
         transform.position.set(0,0,0);
 
@@ -214,99 +308,6 @@ export default class World extends GameObject {
 
         //#region artwork 1
 
-        async function initArtwork(world, no, path, posX, posY, posZ, rotY){
-            world.addChild(new GameObject(`artwork${no}_1`));
-
-            const layers = 16;
-            const layerOpacityFalloff = 1 / layers;
-            const layerOffset = -0.025;
-            let material = await Materials.ArtworkMaterial(`assets/art_1/${path}.png`);
-
-            gameObject = world.findByName(`artwork${no}_1`);
-            gameObject.addBody(new THREE.Mesh(
-                new THREE.PlaneGeometry(5, 5), 
-                material
-            ));
-            gameObject.transform.position.setX(posX);
-            gameObject.transform.position.setZ(posZ);
-            gameObject.transform.position.setY(posY);
-            gameObject.transform.rotation.setY(rotY); 
-            
-            for (let index = 0; index < layers ; index++) {
-                let trace = new THREE.Mesh(
-                    new THREE.PlaneGeometry(5, 5), 
-                    await material.clone(),
-                );
-                trace.traverse(child => {
-                    if (child.isMesh) {child.material.opacity = 1 - layerOpacityFalloff * index;}
-                });
-                gameObject.body.add(trace);
-                trace.position.setZ(index * layerOffset);
-            }
-        }
-        async function artworkLayer(world, no, layer, path){
-            world.findByName(`artwork${no}_${layer-1}`).addChild(new GameObject(`artwork${no}_${layer}`));
-
-            const layers = 16;
-            const layerOpacityFalloff = 1 / layers;
-            const layerOffset = -0.025;
-            let material = await Materials.ArtworkMaterial(`assets/art_${no}/${path}.png`);
-
-            gameObject = world.findByName(`artwork${no}_${layer}`);
-            gameObject.addBody(new THREE.Mesh(
-                new THREE.PlaneGeometry(5, 5), 
-                material
-            ));
-            gameObject.transform.position.setZ(-0.6); 
-            gameObject.body.scale.set(1.05,1.05,1.0); 
-
-            for (let index = 0; index < layers ; index++) {
-                let trace = new THREE.Mesh(
-                    new THREE.PlaneGeometry(5, 5), 
-                    material.clone(),
-                );
-                trace.traverse(child => {
-                    if (child.isMesh) {child.material.opacity = 1 - layerOpacityFalloff * index;}
-                });
-                gameObject.body.add(trace);
-                trace.position.setZ(index * layerOffset);
-            }
-        }
-        async function artworkCaption(world, no, text, width, height, xOffset, yOffset, bgColor, textStyle){ 
-            world.findByName(`artwork${no}_1`).addChild(new GameObject(`artwork${no}_caption`));
-            let material = await Materials.CaptionMaterial(text,width,height,xOffset,yOffset,bgColor='black',textStyle);
-
-            gameObject = world.findByName(`artwork${no}_caption`);
-            gameObject.addBody(new THREE.Mesh(
-                new THREE.PlaneGeometry(5, 1), 
-                material
-            ));
-            gameObject.transform.position.setZ(2.5); 
-            gameObject.transform.position.setY(-2); 
-            gameObject.transform.rotation.setX(-Math.PI / 4);  
-            gameObject.body.scale.set(1.05,1.05,1.0); 
-
-            function trace(gameObject, material, count){
-                let trace = new THREE.Mesh(
-                    new THREE.PlaneGeometry(5, 1), 
-                    material.clone(),
-                );
-                trace.traverse(child => {
-                    if (child.isMesh) {child.material.opacity = 0.8 - 0.1 * count;}
-                });
-                gameObject.body.add(trace);
-                trace.position.setZ(count * -0.05);
-            }
-
-            trace(gameObject, material, 1);
-            trace(gameObject, material, 2);
-            trace(gameObject, material, 3);
-            trace(gameObject, material, 4);
-            trace(gameObject, material, 5);
-            trace(gameObject, material, 6);
-            trace(gameObject, material, 7);
-        }
-
         await initArtwork(this, 1, 5, -8, -3, 74, Math.PI / 2);
         await artworkLayer(this, 1, 2, 6);
         await artworkLayer(this, 1, 3, 4);
@@ -315,6 +316,45 @@ export default class World extends GameObject {
         await artworkLayer(this, 1, 6, 3);
         await artworkCaption(this, 1, `"[Peer] [pr-E55(sure)]"`, 512, 128, 50, 72, 'black', { 
             shadowColor: "rgba(185, 60, 255, 1)"
+        });
+
+        //#endregion
+
+        //#region artwork 2
+
+        await initArtwork(this, 2, 4, -8, -3, 64, Math.PI / 2);
+        await artworkLayer(this, 2, 2, 3);
+        await artworkLayer(this, 2, 3, 2);
+        await artworkLayer(this, 2, 4, 1);
+        await artworkCaption(this, 2, `"privacy:[D]-ISCR-3PAN-CY"`, 630, 128, 80, 72, 'black', { 
+            shadowColor: "rgba(185, 160, 255, 1)"
+        });
+
+        //#endregion
+
+        //#region artwork 3
+
+        await initArtwork(this, 3, 5, -8, -3, 54, Math.PI / 2);
+        await artworkLayer(this, 3, 2, 3);
+        await artworkLayer(this, 3, 3, 6);
+        await artworkLayer(this, 3, 4, 2);
+        await artworkLayer(this, 3, 5, 4);
+        await artworkLayer(this, 3, 6, 1);
+        await artworkCaption(this, 3, `"[RHER, the Tr1ckster M00n G0d]"`, 720, 128, 80, 72, 'black', { 
+            shadowColor: "rgba(185, 255, 20, 1)"
+        });
+
+        //#endregion
+
+        //#region artwork 4
+
+        await initArtwork(this, 4, 4, -8, -3, 44, Math.PI / 2);
+        await artworkLayer(this, 4, 2, 5);
+        await artworkLayer(this, 4, 3, 1);
+        await artworkLayer(this, 4, 4, 2);
+        await artworkLayer(this, 4, 5, 3);
+        await artworkCaption(this, 4, `"[TETRA]-p0d1<um>"`, 512, 128, 95, 72, 'black', { 
+            shadowColor: "rgb(20, 255, 255)"
         });
 
         //#endregion
